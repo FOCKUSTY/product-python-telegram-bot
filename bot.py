@@ -40,4 +40,5 @@ def start(message: Message):
     
 
 if __name__ == "__main__":
+    print("Включение бота")
     bot.infinity_polling()
