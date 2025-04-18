@@ -1,4 +1,5 @@
 from telebot.types import Message
+from typing import Callable
 
 import telebot
 import env
@@ -9,20 +10,27 @@ bot = telebot.TeleBot(env.get("TELEGRAM_TOKEN"))
 
 COMMANDS = Download()
 
+def SendMessageByMessage(message: Message) -> Callable[[str], Message]:
+    def send(text: str) -> Message:
+        return bot.send_message(message.from_user.id, text)
+
+    return send
+
 @bot.message_handler(content_types=['text'])
 def start(message: Message):
     command_name = message.text.split(" ")[0].split("/")[1]
     args = message.text.split(" ")
+    sendToUser = SendMessageByMessage(message)
 
     if len(args) > 1 and args[1] == "help" and command_name != "help":
-        return bot.send_message(message.from_user.id, COMMANDS[command_name][1])
+        return sendToUser(COMMANDS[command_name][1])
 
     try:
         command = COMMANDS[command_name][0]
 
         try:
             command({
-                "send": lambda text: bot.send_message(message.from_user.id, text),
+                "send": sendToUser,
                 "args": args,
                 "message": message,
                 "bot": bot,
