@@ -22,6 +22,8 @@ def start(message: Message):
     args = message.text.split(" ")
     sendToUser = SendMessageByMessage(message)
 
+    print("Вызвана комнада " + command_name)
+
     if len(args) > 1 and args[1] == "help" and command_name != "help":
         return sendToUser(COMMANDS[command_name][1])
 
@@ -29,13 +31,17 @@ def start(message: Message):
         command = COMMANDS[command_name][0]
 
         try:
-            command({
+            data = command({
                 "send": sendToUser,
                 "args": args,
                 "message": message,
                 "bot": bot,
                 "commands": COMMANDS
             })
+
+            print(f"Выполнена команда {command_name} пользователей {message.from_user.id}")
+            print("Результат выполнения:")
+            print(data)
         except Exception as error:
             print(error)
     except:

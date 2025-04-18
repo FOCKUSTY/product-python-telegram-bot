@@ -7,7 +7,7 @@ import database
 
 KEYS = SHOW_KEYS
 
-def Execute(data: CommandInput):
+def Execute(data: CommandInput) -> str:
     args = data["args"]
     send = data["send"]
 
@@ -18,16 +18,18 @@ def Execute(data: CommandInput):
             product = f"Товар: {p.name}. Цена: {p.price}. Количество: {p.count}. Идентификатор: {p.id}"
             products = products + "\n" + product + "\n"
 
-        return send("Наши товары:\n" + products)
+        return send("Наши товары:\n" + products).text
 
     whereclause = args[1].replace(SPACE[0], SPACE[1]).split("=")
 
     if not whereclause[0] in KEYS and not whereclause[0].isdigit():
-        return send(f"Неправильный ввод значения, попробуйте:\n/show {KEYS[0]}=\n/show {KEYS[1]}=\n/show {KEYS[2]}=")
+        return send(f"Неправильный ввод значения, попробуйте:\n/show {KEYS[0]}=\n/show {KEYS[1]}=\n/show {KEYS[2]}=").text
 
     first = whereclause[0] if not whereclause[0].isdigit() else "id"
     second = whereclause[1] if whereclause[0] in KEYS else whereclause[0]
     products = list(session.scalars(select(ProductBase).where(eval(f"ProductBase.{first}") == second)).all())
+
+    output = ""
 
     for p in products:
         data = "\n".join([
@@ -41,9 +43,9 @@ def Execute(data: CommandInput):
         if not p.description == "": data = data + f"\n\nОписание:\n{p.description}"
         if not p.image_url == "": data = data + f"\n\n Ссылка на картинку: {p.image_url}" 
 
-        send(data)
+        output = output + "\n" + send(data).text
 
-    return
+    return products
 
 help = GenerateHelp([
     "Используйте /show help чтобы показать это меню",

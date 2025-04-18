@@ -10,7 +10,7 @@ DEFAULT_SPLITTER: Final[str] = "\n\n"
 COMMANDS_DIR: Final[str] = "commands"
 
 class CommandInput(TypedDict):
-    send: Callable[[str], Any]
+    send: Callable[[str], Message]
     args: tuple[str]
     message: Message
     bot: telebot.TeleBot
