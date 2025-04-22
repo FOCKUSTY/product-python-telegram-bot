@@ -1,34 +1,38 @@
+from typing import Literal
 from constants import SPACE, SHOW_KEYS, GenerateHelp, CommandInput
 
-from sqlalchemy import select
-from database import ProductBase, session
+from database import get
 
 import database
 
-KEYS = SHOW_KEYS
+KEYS: tuple[
+    Literal['id'],
+    Literal['name'],
+    Literal['address'],
+    Literal['page'],
+] = tuple(list(SHOW_KEYS) + ["page"])
 
 def Execute(data: CommandInput) -> str:
-    args = data["args"]
+    args: list[str] = data["args"][1:len(data["args"])]
     send = data["send"]
 
-    if len(args) == 1:
+    if len(args) == 0:
         products = ""
 
-        for p in database.get(ProductBase):
-            product = f"Товар: {p.name}. Цена: {p.price}. Количество: {p.count}. Идентификатор: {p.id}"
+        for p in get(["page=1"]):
+            product = f"Товар: {p.name}. Цена: {p.price}. Количество: {p.count}. Идентификатор: {p.id}. Адрес: {p.address}"
             products = products + "\n" + product + "\n"
 
         return send("Наши товары:\n" + products).text
 
-    whereclause = args[1].replace(SPACE[0], SPACE[1]).split("=")
+    if len(args) == 1 and args[1].isdigit():
+        args = ["id="+args[1]]
 
-    if not whereclause[0] in KEYS and not whereclause[0].isdigit():
-        return send(f"Неправильный ввод значения, попробуйте:\n/show {KEYS[0]}=\n/show {KEYS[1]}=\n/show {KEYS[2]}=").text
+    for arg in args:
+        if not arg.split("=")[0] in KEYS:
+            return send(f"Неправильный ввод значения, попробуйте:\n/show {KEYS[0]}=\n/show {KEYS[1]}=\n/show {KEYS[2]}=").text
 
-    first = whereclause[0] if not whereclause[0].isdigit() else "id"
-    second = whereclause[1] if whereclause[0] in KEYS else whereclause[0]
-    products = list(session.scalars(select(ProductBase).where(eval(f"ProductBase.{first}") == second)).all())
-
+    products = get(args)
     output = ""
 
     for p in products:
@@ -53,5 +57,6 @@ help = GenerateHelp([
     "Используйте /show {id} для просмотра конкретного товара (Пример: /show 1)",
     "Используйте /show {method}={value} для просмотра конкретного товара. Примеры:\n/show id=1\n/show name=Виноград\n/show address=г.-Уфа-ул.-Пушкина-56",
     f"Используйте \"{SPACE[0]}\" вместо привычного пробела для его поставления (/show address=г.-Уфа-ул.-Пушкина-56)",
-    "Все возможные методы сортировки: " + ", ".join(KEYS)
+    "Все возможные методы сортировки: " + ", ".join(KEYS),
+    "Используйте /show page={page}, чтобы вывести определенную страницу (Пример: /show page=1 или /show name=Виноград page=1)"
 ])
