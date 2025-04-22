@@ -16,14 +16,16 @@ def Execute(data: CommandInput) -> str:
     args: list[str] = data["args"][1:len(data["args"])]
     send = data["send"]
 
+    page = "1"
+
     if len(args) == 0:
         products = ""
 
-        for p in get(["page=1"]):
+        for p in get(["page=" + page], True):
             product = f"Товар: {p.name}. Цена: {p.price}. Количество: {p.count}. Идентификатор: {p.id}. Адрес: {p.address}"
             products = products + "\n" + product + "\n"
 
-        return send("Наши товары:\n" + products).text
+        return send(f"Наши товары:\n{products}\n\nСтраница: {page}\nЧтобы перейти на следующую, введите: /show page={int(page)+1}").text
 
     if len(args) == 1 and args[1].isdigit():
         args = ["id="+args[1]]
@@ -32,7 +34,7 @@ def Execute(data: CommandInput) -> str:
         if not arg.split("=")[0] in KEYS:
             return send(f"Неправильный ввод значения, попробуйте:\n/show {KEYS[0]}=\n/show {KEYS[1]}=\n/show {KEYS[2]}=").text
 
-    products = get(args)
+    products = get(args, True)
     output = ""
 
     for p in products:

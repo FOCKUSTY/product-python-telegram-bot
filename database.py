@@ -3,7 +3,7 @@ import random
 
 from constants import SPACE
 
-connection = sqlite3.connect('test.db')
+connection = sqlite3.connect('test.db', check_same_thread=False)
 cursor = connection.cursor()
 
 cursor.execute('''
@@ -180,7 +180,7 @@ if __name__ == "__main__":
         return array[random.randint(0, len(array)-1)]
 
     length = 0
-    length = 2025
+    length = 200
 
     for i in range(length):
         address = f"г. {getRandom(datas["г"])} ул. {getRandom(datas['ул'])} д. {getRandom(datas['д'])}"

@@ -39,7 +39,7 @@ def start(message: Message):
                 "commands": COMMANDS
             })
 
-            print(f"Выполнена команда {command_name} пользователей {message.from_user.id}")
+            print(f"Выполнена команда {command_name} пользователем {message.from_user.id}")
             print("Результат выполнения:")
             print(data)
         except Exception as error:
