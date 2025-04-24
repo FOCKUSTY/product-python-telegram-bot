@@ -87,7 +87,28 @@ def fromArrayToSQL(values: list[str], start: str="WHERE", pageExists: bool = Fal
 
     return (sql, datas, page)
 
-def get(values: list[str], toProductObject: bool = False):
+def updateArray(values: list[str], update: list[str]):
+    updates = {}
+    output = []
+
+    for v in update:
+        up = v.split("=")
+        updates[up[0]] = up[1]
+
+    for value in values:
+        v = value.split("=")
+
+        if v[0] in updates:
+            if "-" in updates[up[0]] or "+" in updates[up[0]]:
+                output.append(f"{v[0]}={int(v[1]) + int(updates[up[0]])}")
+            else:
+                output.append(f"{v[0]}={updates[up[0]]}")
+        else:
+            output.append(f"{v[0]}={v[1]}")
+
+    return output
+
+def get(values: list[str], toProductObject: bool = False) -> tuple[list[Product], int]:
     global page
     count = 5
     
@@ -95,17 +116,18 @@ def get(values: list[str], toProductObject: bool = False):
     promt = f"SELECT * FROM products {sql[0]} LIMIT {(page-1)*count}, {count}"
     page = sql[2]
 
-    print("Запрос к БД:\n"+promt)
+    print("Запрос к БД:\n"+promt, sql[1])
     data = cursor.execute(promt, sql[1]).fetchall()
 
     if toProductObject:
         products = []
 
-        for product in data: products.append(fromArrayToObject(product))
+        for product in data:
+            products.append(fromArrayToObject(product))
 
-        return products
+        return (products, page)
 
-    return data
+    return (data, page)
 
 def delete(id: int):
     data = cursor.execute("DELETE FROM products id = ?", (id))
@@ -180,7 +202,7 @@ if __name__ == "__main__":
         return array[random.randint(0, len(array)-1)]
 
     length = 0
-    length = 200
+    length = 30
 
     for i in range(length):
         address = f"г. {getRandom(datas["г"])} ул. {getRandom(datas['ул'])} д. {getRandom(datas['д'])}"

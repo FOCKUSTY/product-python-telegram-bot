@@ -1,9 +1,9 @@
+import telebot
+
 from typing import Literal
-from constants import SPACE, SHOW_KEYS, GenerateHelp, CommandInput
+from constants import SPACE, SHOW_KEYS, GenerateHelp, CommandInput, BUTTONS
 
 from database import get
-
-import database
 
 KEYS: tuple[
     Literal['id'],
@@ -15,8 +15,15 @@ KEYS: tuple[
 def Execute(data: CommandInput) -> str:
     args: list[str] = data["args"][1:len(data["args"])]
     send = data["send"]
+    bot = data["bot"]
+    message = data["message"]
 
     page = "1"
+
+    keyboard = telebot.types.InlineKeyboardMarkup()
+    buttonNext = telebot.types.InlineKeyboardButton(text="===>", callback_data=BUTTONS["next_page"])
+    buttonPrevious = telebot.types.InlineKeyboardButton(text="<===", callback_data=BUTTONS["previous_page"])
+    keyboard.add(buttonPrevious, buttonNext)
 
     if len(args) == 0:
         products = ""
@@ -25,16 +32,20 @@ def Execute(data: CommandInput) -> str:
             product = f"Товар: {p.name}. Цена: {p.price}. Количество: {p.count}. Идентификатор: {p.id}. Адрес: {p.address}"
             products = products + "\n" + product + "\n"
 
-        return send(f"Наши товары:\n{products}\n\nСтраница: {page}\nЧтобы перейти на следующую, введите: /show page={int(page)+1}").text
+        return bot.send_message(
+            message.from_user.id,
+            f"page: {page}\nНаши товары:\n{products}\nЧтобы перейти на следующую, введите: /show page={int(page)+1}",
+            reply_markup=keyboard
+        ).text
 
-    if len(args) == 1 and args[1].isdigit():
-        args = ["id="+args[1]]
+    if len(args) == 1 and args[0].isdigit():
+        args = ["id="+args[0]]
 
     for arg in args:
         if not arg.split("=")[0] in KEYS:
             return send(f"Неправильный ввод значения, попробуйте:\n/show {KEYS[0]}=\n/show {KEYS[1]}=\n/show {KEYS[2]}=").text
 
-    products = get(args, True)
+    products, page = get(args, True)
     output = ""
 
     for p in products:
@@ -47,11 +58,14 @@ def Execute(data: CommandInput) -> str:
         ])
 
         if not p.description == "": data = data + f"\n\nОписание:\n{p.description}"
-        if not p.image_url == "": data = data + f"\n\n Ссылка на картинку: {p.image_url}" 
+        if not p.image_url == "": data = data + f"\n\nСсылка на картинку: {p.image_url}"
 
-        output = output + "\n" + send(data).text
+        output = output + "\n" + data + "\n"
 
-    return products
+    if not f"page={page}" in args:
+      return bot.send_message(message.from_user.id, " ".join([f"page={page}"] + args) + "\n" + output, reply_markup=keyboard).text
+    
+    return bot.send_message(message.from_user.id, " ".join(args) + "\n" + output, reply_markup=keyboard).text
 
 help = GenerateHelp([
     "Используйте /show help чтобы показать это меню",

@@ -45,5 +45,14 @@ NO_REQUIRED_PRODUCT_OPTIONS: Final[tuple[str | None]] = (
     PRODUCT_OPTIONS["image_url"]    
 )
 
+class Buttons(TypedDict):
+    next_page: str
+    previous_page: str
+
+BUTTONS: Final[Buttons] = {
+    "next_page": "next_page",
+    "previous_page": "previous_page"
+}
+
 def GenerateHelp(args: list[str], splitter: str = DEFAULT_SPLITTER):
     return splitter.join(args)
