@@ -31,8 +31,6 @@ def PageHandler(operator: str):
       products, _ = get(args, True)
       output = ""
 
-      print(products)
-
       for p in products:
           data = "\n".join([
               f"Товар: {p.name}",

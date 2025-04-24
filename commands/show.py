@@ -28,7 +28,9 @@ def Execute(data: CommandInput) -> str:
     if len(args) == 0:
         products = ""
 
-        for p in get(["page=" + page], True):
+        datas, _ = get(["page=" + page], True)
+
+        for p in datas:
             product = f"Товар: {p.name}. Цена: {p.price}. Количество: {p.count}. Идентификатор: {p.id}. Адрес: {p.address}"
             products = products + "\n" + product + "\n"
 
