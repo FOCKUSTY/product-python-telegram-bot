@@ -11,10 +11,10 @@ def Execute(data: CommandInput):
     message = data["message"]
 
     if not f"{message.from_user.id}" in env.get("ADMINS_TELEGRAM_IDS").split(","):
-        return send("У Вас нет доступа к этой команде").text
+        return send("У Вас нет доступа к этой команде")
     
     if len(args) == 1:
-        return send("Вы должны указать следующие значения:\n" + ", ".join(PRODUCT_OPTIONS) + "\n\nИз которых обязательные:\n" + " ,".join(REQUIRED_PRODUCT_OPTIONS)).text
+        return send("Вы должны указать следующие значения:\n" + ", ".join(PRODUCT_OPTIONS) + "\n\nИз которых обязательные:\n" + " ,".join(REQUIRED_PRODUCT_OPTIONS))
     
     options = {}
     args.pop(0)
@@ -32,7 +32,7 @@ def Execute(data: CommandInput):
 
     for i in REQUIRED_PRODUCT_OPTIONS:
         if not i in keys:
-            return send(f"Ключ {i} обязательный. Все обязательные ключи:\n" + ", ".join(REQUIRED_PRODUCT_OPTIONS)).text
+            return send(f"Ключ {i} обязательный. Все обязательные ключи:\n" + ", ".join(REQUIRED_PRODUCT_OPTIONS))
 
     product = database.Product(
         name=options[PRODUCT_OPTIONS["name"]],
@@ -43,7 +43,7 @@ def Execute(data: CommandInput):
         image_url=(options[PRODUCT_OPTIONS["image_url"]] if PRODUCT_OPTIONS["image_url"] in options else ""),
     )
 
-    return send("Продукт создан\n" + product.__repr__()).text
+    return send("Продукт создан\n" + product.__repr__())
 
     
 help = GenerateHelp([

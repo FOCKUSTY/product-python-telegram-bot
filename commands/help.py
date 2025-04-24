@@ -12,9 +12,9 @@ def Execute(data: CommandInput) -> str:
     commands = data["commands"]
 
     if len(args) > 1 and args[1] in commands:
-        return send(commands[args[1]][1]).text
+        return send(commands[args[1]][1])
 
     if len(args) > 1 and args[1] == "commands":
-        return send("Все возможные команды:\n/" + "\n/".join(data["commands"].keys())).text
+        return send("Все возможные команды:\n/" + "\n/".join(data["commands"].keys()))
 
-    return send(help).text
+    return send(help)

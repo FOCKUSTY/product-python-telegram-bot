@@ -38,14 +38,14 @@ def Execute(data: CommandInput) -> str:
             message.from_user.id,
             f"page: {page}\nНаши товары:\n{products}\nЧтобы перейти на следующую, введите: /show page={int(page)+1}",
             reply_markup=keyboard
-        ).text
+        )
 
     if len(args) == 1 and args[0].isdigit():
         args = ["id="+args[0]]
 
     for arg in args:
         if not arg.split("=")[0] in KEYS:
-            return send(f"Неправильный ввод значения, попробуйте:\n/show {KEYS[0]}=\n/show {KEYS[1]}=\n/show {KEYS[2]}=").text
+            return send(f"Неправильный ввод значения, попробуйте:\n/show {KEYS[0]}=\n/show {KEYS[1]}=\n/show {KEYS[2]}=")
 
     products, page = get(args, True)
     output = ""
@@ -65,9 +65,9 @@ def Execute(data: CommandInput) -> str:
         output = output + "\n" + data + "\n"
 
     if not f"page={page}" in args:
-      return bot.send_message(message.from_user.id, " ".join([f"page={page}"] + args) + "\n" + output, reply_markup=keyboard).text
+      return bot.send_message(message.from_user.id, " ".join([f"page={page}"] + args) + "\n" + output, reply_markup=keyboard)
     
-    return bot.send_message(message.from_user.id, " ".join(args) + "\n" + output, reply_markup=keyboard).text
+    return bot.send_message(message.from_user.id, " ".join(args) + "\n" + output, reply_markup=keyboard)
 
 help = GenerateHelp([
     "Используйте /show help чтобы показать это меню",

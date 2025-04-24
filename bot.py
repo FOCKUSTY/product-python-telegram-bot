@@ -64,7 +64,7 @@ def start(message: Message):
         command = COMMANDS[command_name][0]
 
         try:
-            command({
+            data = command({
                 "send": sendToUser,
                 "args": args,
                 "message": message,
@@ -73,6 +73,7 @@ def start(message: Message):
             })
 
             print(f"Выполнена команда {command_name} пользователем {message.from_user.id}")
+            print(data.text)
         except Exception as error:
             print(error)
     except:
