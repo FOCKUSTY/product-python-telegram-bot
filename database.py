@@ -116,6 +116,19 @@ def get(values: list[str], toProductObject: bool = False) -> tuple[list[Product]
     promt = f"SELECT * FROM products {sql[0]} LIMIT {(page-1)*count}, {count}"
     page = sql[2]
 
+    if int(page) <= 1:
+        data = cursor.execute(f"SELECT * FROM products {sql[0]} LIMIT {(page-1)*count}, {count}", sql[1]).fetchall()
+
+        if toProductObject:
+            products = []
+
+            for product in data:
+                products.append(fromArrayToObject(product))
+
+            return (products, 1)
+    
+        return (data, 1)
+
     print("Запрос к БД:\n"+promt, sql[1])
     data = cursor.execute(promt, sql[1]).fetchall()
 

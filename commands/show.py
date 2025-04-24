@@ -36,7 +36,7 @@ def Execute(data: CommandInput) -> str:
 
         return bot.send_message(
             message.from_user.id,
-            f"page: {page}\nНаши товары:\n{products}\nЧтобы перейти на следующую, введите: /show page={int(page)+1}",
+            f"page={page}\nНаши товары:\n{products}\nЧтобы перейти на следующую, введите: /show page={int(page)+1}",
             reply_markup=keyboard
         )
 

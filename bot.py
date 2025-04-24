@@ -28,7 +28,7 @@ def PageHandler(operator: str):
       buttonPrevious = telebot.types.InlineKeyboardButton(text="<===", callback_data=BUTTONS["previous_page"])
       keyboard.add(buttonPrevious, buttonNext)
 
-      products, _ = get(args, True)
+      products, page = get(args, True)
       output = ""
 
       for p in products:
@@ -45,7 +45,9 @@ def PageHandler(operator: str):
 
           output = output + "\n" + data + "\n"
       
-      return bot.send_message(call.message.chat.id, " ".join(args) + "\n" + output, reply_markup=keyboard).text
+      print("Кнопка использована в", call.message.chat.id)
+      print(" ".join(args) + "\n" + output)
+      return bot.send_message(call.message.chat.id, " ".join(updateArray(args, [f"page={page}"])) + "\n" + output, reply_markup=keyboard).text
     
     return nextPage
 
